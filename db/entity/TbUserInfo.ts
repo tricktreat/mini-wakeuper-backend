@@ -1,5 +1,6 @@
-import {Entity, PrimaryColumn, Column, BaseEntity,OneToMany} from "typeorm";
-import { SigninInfo } from "./SigninInfo";
+import {Entity, PrimaryColumn, Column, BaseEntity,OneToMany, CreateDateColumn} from "typeorm";
+import { SigninInfo } from "./TbSigninInfo";
+import { LikeInfo } from "./TbLikeInfo";
 
 @Entity()
 export class UserInfo extends BaseEntity {
@@ -72,6 +73,12 @@ export class UserInfo extends BaseEntity {
     })
     country: string;
 
+    @CreateDateColumn()
+    registerTime:Date;
+
     @OneToMany(type => SigninInfo, signinfo => signinfo.user)
     signinfos: SigninInfo[];
+    
+    @OneToMany(type => LikeInfo, likeinfo => likeinfo.toUser)
+    likeinfos: SigninInfo[];
 }

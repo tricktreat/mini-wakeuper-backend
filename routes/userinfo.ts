@@ -2,18 +2,30 @@ import {Router,Request, Response,NextFunction} from "express";
 import axios from "axios";
 import * as qs from 'querystring';
 import connection from "../db/connection";
-import { UserInfo } from "../db/entity/UserInfo";
+import { UserInfo } from "../db/entity/TbUserInfo";
+import {MoreThanOrEqual} from "typeorm";
 const router = Router();
 
 router.get('/', function(req:Request, res:Response,next:NextFunction) {
-    let args = req.body
+    let args = req.query
     connection.then(
         async conn=>{
             const userInfoRepository = conn.getRepository(UserInfo);
-            const userinfo=await userInfoRepository.findOne(args.openId);
-            userInfoRepository.merge(userinfo, args);
-            userInfoRepository.save(userinfo);
-            res.json({"message":"success"});
+            const userinfo=await userInfoRepository.findOne({
+              relations:["signinfos","likeinfos"],
+              join:{
+                  alias: "userinfo",
+              },
+              where:Object.assign(args,{"userinfo.signinfos.signTime":MoreThanOrEqual(new Date().setHours(0,0,0,0))}),
+            })
+            userinfo["corn"]=userinfo.signinfos.reduce((prev,cur)=>{
+              return prev+cur.corn
+            },0)
+            userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{
+              return prev+cur.corn
+            },0)
+            res.json({message:"success",data:userinfo});
+            res.json({message:"success",data:userinfo});
           }
     )
 });
@@ -26,7 +38,7 @@ router.post('/updateuser', function(req:Request, res:Response,next:NextFunction)
             const userinfo=await userInfoRepository.findOne(args.openId);
             userInfoRepository.merge(userinfo, args);
             userInfoRepository.save(userinfo);
-            res.json({"message":"success"});
+            res.json({message:"success"});
           }
     )
 });
@@ -44,17 +56,30 @@ router.get('/register', function(req:Request, res:Response,next:NextFunction) {
         connection.then(
           async conn=>{
             const userInfoRepository = conn.getRepository(UserInfo);
-            const userinfo=await userInfoRepository.findOne(openId)
+            let userinfo=await userInfoRepository.findOne({
+              relations:["signinfos","likeinfos"],
+              join:{
+                  alias: "userinfo",
+              },
+              where:{"userinfo.signinfos.signTime":MoreThanOrEqual(new Date().setHours(0,0,0,0))},
+            })
             if(!userinfo){
-              const newuser=userInfoRepository.create({"openId":openId})
-              userInfoRepository.save(newuser);
-              res.json({"openid":openId});
+              userinfo=userInfoRepository.create({"openId":openId})
+              userInfoRepository.save(userinfo);
+              userinfo["signinfos"]=[]
+              userinfo["likeinfos"]=[]
             }
-            res.json(userinfo);
+            userinfo["corn"]=userinfo.signinfos.reduce((prev,cur)=>{
+              return prev+cur.corn
+            },0)
+            userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{
+              return prev+cur.corn
+            },0)
+            res.json({message:"success",data:userinfo});
           }
         )
       }else{
-        res.json(response.data);
+        res.json({message:"fail",data:response.data});
       }
     })
 });

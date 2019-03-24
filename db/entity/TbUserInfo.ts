@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Entity, PrimaryColumn, Column, BaseEntity,OneToMany, CreateDateColumn} from "typeorm";
 import { SigninInfo } from "./TbSigninInfo";
 import { LikeInfo } from "./TbLikeInfo";
@@ -12,6 +13,11 @@ export class UserInfo extends BaseEntity {
         default:""
     })
     phoneNumber: string;
+
+    @Column({
+        default:""
+    })
+    name: string;
 
     @Column({
         default:""
@@ -53,6 +59,12 @@ export class UserInfo extends BaseEntity {
     })
     gender: number;
 
+    
+    @Column({
+        default:0
+    })
+    member: number;
+
     @Column({
         default:null
     })
@@ -72,6 +84,11 @@ export class UserInfo extends BaseEntity {
         default:""
     })
     country: string;
+
+    @Column({
+        default:"未设置标签"
+    })
+    tag: string;
 
     @CreateDateColumn()
     registerTime:Date;

@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import * as express from "express";
 import {Request, Response} from "express";
 import * as bodyParser from  "body-parser";
@@ -17,5 +18,4 @@ app.get('/',function(req: Request, res: Response){
 	res.status(200).send("wakeuper")
 });
 
-
-app.listen(8899);
+app.listen(8888);

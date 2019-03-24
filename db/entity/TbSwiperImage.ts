@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Entity, PrimaryColumn, Column, BaseEntity,ManyToOne,JoinColumn, PrimaryGeneratedColumn} from "typeorm";
 
 @Entity()

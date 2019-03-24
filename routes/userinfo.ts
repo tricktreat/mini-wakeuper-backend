@@ -1,9 +1,11 @@
+import "reflect-metadata";
 import {Router,Request, Response,NextFunction} from "express";
 import axios from "axios";
 import * as qs from 'querystring';
 import connection from "../db/connection";
 import { UserInfo } from "../db/entity/TbUserInfo";
-import {MoreThanOrEqual} from "typeorm";
+import {MoreThanOrEqual, MoreThan, Like} from "typeorm";
+import { SigninInfo } from "../db/entity/TbSigninInfo";
 const router = Router();
 
 router.get('/', function(req:Request, res:Response,next:NextFunction) {
@@ -11,20 +13,33 @@ router.get('/', function(req:Request, res:Response,next:NextFunction) {
     connection.then(
         async conn=>{
             const userInfoRepository = conn.getRepository(UserInfo);
+            const signInfoRepository = conn.getRepository(SigninInfo);
+            let now = new Date()
+            let year=now.getFullYear()
+            let month = now.getMonth()+1
+            let date = now.getDate()
+            let todaysigninfo=await signInfoRepository.find({
+              where:{user:args.openId,signTime:MoreThanOrEqual( year + "-" + (month[1] ? month : '0' + month) + "-" + (date[1] ? date : '0' + date))},
+            })
+            let allsigninfo=await signInfoRepository.find({
+              where:{user:args.openId},
+            })
             const userinfo=await userInfoRepository.findOne({
-              relations:["signinfos","likeinfos"],
+              relations:["likeinfos"],
               join:{
                   alias: "userinfo",
               },
-              where:Object.assign(args,{"userinfo.signinfos.signTime":MoreThanOrEqual(new Date().setHours(0,0,0,0))}),
+              where:args,
             })
-            userinfo["corn"]=userinfo.signinfos.reduce((prev,cur)=>{
+            userinfo['signinfos']=todaysigninfo
+            userinfo["tags"]=userinfo["tag"].split(';',3)
+            delete userinfo.tag
+            userinfo["corn"]=allsigninfo.reduce((prev,cur)=>{
               return prev+cur.corn
             },0)
             userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{
               return prev+cur.corn
             },0)
-            res.json({message:"success",data:userinfo});
             res.json({message:"success",data:userinfo});
           }
     )
@@ -43,6 +58,24 @@ router.post('/updateuser', function(req:Request, res:Response,next:NextFunction)
     )
 });
 
+router.get('/member', function(req:Request, res:Response,next:NextFunction) {
+  let args = req.query
+  connection.then(
+      async conn=>{
+          const userInfoRepository = conn.getRepository(UserInfo);
+          let where={}
+          where["member"]=MoreThan(0)
+          if(args.patten){
+            where["name"]=Like(args.patten)
+          }
+          const userinfo=await userInfoRepository.find({
+            where:where
+          });
+          res.json({message:"success",data:userinfo});
+        }
+  )
+});
+
 router.get('/register', function(req:Request, res:Response,next:NextFunction) {
     //3597e6cfb8339a61cacb77ced622d3f3
     //wxce0af3f23f9eee19
@@ -55,21 +88,35 @@ router.get('/register', function(req:Request, res:Response,next:NextFunction) {
       if(openId){
         connection.then(
           async conn=>{
+            // console.log(new Date().toLocaleDateString())
             const userInfoRepository = conn.getRepository(UserInfo);
+            const signInfoRepository = conn.getRepository(SigninInfo);
+            let now = new Date()
+            let year=now.getFullYear()
+            let month = now.getMonth()+1
+            let date = now.getDate()
+            let todaysigninfo=await signInfoRepository.find({
+              where:{user:openId,signTime:MoreThanOrEqual( year + "-" + (month[1] ? month : '0' + month) + "-" + (date[1] ? date : '0' + date))},
+            })
+            let allsigninfo=await signInfoRepository.find({
+              where:{user:openId},
+            })
             let userinfo=await userInfoRepository.findOne({
-              relations:["signinfos","likeinfos"],
+              relations:["likeinfos"],
               join:{
                   alias: "userinfo",
               },
-              where:{"userinfo.signinfos.signTime":MoreThanOrEqual(new Date().setHours(0,0,0,0))},
+              where:{openId:openId},
             })
             if(!userinfo){
-              userinfo=userInfoRepository.create({"openId":openId})
+              userinfo=userInfoRepository.create({openId:openId})
               userInfoRepository.save(userinfo);
-              userinfo["signinfos"]=[]
-              userinfo["likeinfos"]=[]
+              userinfo["likeinfos"]=[];
             }
-            userinfo["corn"]=userinfo.signinfos.reduce((prev,cur)=>{
+            userinfo["signinfos"]=todaysigninfo;
+            userinfo["tags"]=userinfo["tag"].split(';',3)
+            delete userinfo.tag
+            userinfo["corn"]=allsigninfo.reduce((prev,cur)=>{
               return prev+cur.corn
             },0)
             userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{

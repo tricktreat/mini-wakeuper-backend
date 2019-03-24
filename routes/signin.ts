@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Router,Request, Response,NextFunction} from "express";
 import axios from "axios";
 import * as qs from 'querystring';
@@ -9,10 +10,11 @@ const router = Router();
 
 router.post('/', function(req:Request, res:Response,next:NextFunction) {
     let args=req.body
+    console.log("签到参数："+args.signTime)
     connection.then(
     async conn=>{
         const signinInfoRepository = conn.getRepository(SigninInfo);
-        const signinfo=signinInfoRepository.create({"user":args.openId,"signTime":new Date(parseInt(args.signTime))})
+        const signinfo=signinInfoRepository.create({"user":args.openId,"signTime":new Date(args.signTime)})
         signinInfoRepository.save(signinfo);
         res.json({"message":"success"});
     })
@@ -20,6 +22,7 @@ router.post('/', function(req:Request, res:Response,next:NextFunction) {
 
 router.get('/day', function(req:Request, res:Response,next:NextFunction) {
     let args=req.query
+    console.log("day："+args.date)
     connection.then(
     async conn=>{
         const signinInfoRepository = conn.getRepository(SigninInfo);
@@ -28,7 +31,7 @@ router.get('/day', function(req:Request, res:Response,next:NextFunction) {
             join:{
                 alias: "signinfo",
             },
-            where:{signTime:MoreThanOrEqual(new Date(parseInt(args.date)))},
+            where:{signTime:MoreThanOrEqual(args.date)},
             order: {
                 signTime: "ASC",
             }
@@ -39,6 +42,7 @@ router.get('/day', function(req:Request, res:Response,next:NextFunction) {
 
 router.get('/month', function(req:Request, res:Response,next:NextFunction) {
     let args=req.query
+    console.log("month："+args.month)
     connection.then(
     async conn=>{
         const userInfoRepository = conn.getRepository(UserInfo);
@@ -47,13 +51,13 @@ router.get('/month', function(req:Request, res:Response,next:NextFunction) {
             join:{
                 alias: "userinfo",
             },
-            where:{"userinfo.signinfos.signTime":MoreThanOrEqual(new Date(parseInt(args.month)))},
+            where:{"userinfo.signinfos.signTime":MoreThanOrEqual(args.month)},
         });
         userinfos.sort((a,b)=>{
             if(a.signinfos.length>b.signinfos.length){
-                return 1
-            }else{
                 return -1
+            }else{
+                return 1
             }
         })
         res.json({message:"success",data:userinfos});
@@ -72,9 +76,9 @@ router.get('/all', function(req:Request, res:Response,next:NextFunction) {
         });
         userinfos.sort((a,b)=>{
             if(a.signinfos.length>b.signinfos.length){
-                return 1
-            }else{
                 return -1
+            }else{
+                return 1
             }
         })
         res.json({message:"success",data:userinfos});

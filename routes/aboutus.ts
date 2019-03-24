@@ -1,3 +1,4 @@
+import "reflect-metadata";
 import {Router,Request, Response,NextFunction} from "express";
 import connection from "../db/connection";
 import { AboutUs } from "../db/entity/TbAboutUs";

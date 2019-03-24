@@ -1,10 +1,18 @@
 {
-    "compilerOptions": {
-      "lib": ["es5", "es6", "dom"],
-      "target": "es5",
-      "module": "commonjs",
-      "moduleResolution": "node",
-      "emitDecoratorMetadata": true,
-      "experimentalDecorators": true
-    }
-  }
+  "compilerOptions": {
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+    "lib": [
+      "es6"
+    ],
+    "outDir": "build",   //编译后文件输出到build这个文件夹内
+    "module": "commonjs",
+    "target": "es5"
+  },
+  "include": [
+    "*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

@@ -5,7 +5,7 @@
     "lib": [
       "es6"
     ],
-    "outDir": "build",   //编译后文件输出到build这个文件夹内
+    "outDir": "build",
     "module": "commonjs",
     "target": "es5"
   },

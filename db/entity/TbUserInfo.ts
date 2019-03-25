@@ -65,9 +65,7 @@ export class UserInfo extends BaseEntity {
     })
     member: number;
 
-    @Column({
-        default:null
-    })
+    @Column({  default: () => `now()`})
     birthday: Date;
 
     @Column({
@@ -86,7 +84,7 @@ export class UserInfo extends BaseEntity {
     country: string;
 
     @Column({
-        default:"未设置标签"
+        default:"电影;音乐;睡觉"
     })
     tag: string;
 

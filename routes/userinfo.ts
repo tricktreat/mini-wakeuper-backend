@@ -69,7 +69,10 @@ router.get('/member', function(req:Request, res:Response,next:NextFunction) {
             where["name"]=Like(args.patten)
           }
           const userinfo=await userInfoRepository.find({
-            where:where
+            where:where,
+            order: {
+              member: "DESC",
+          }
           });
           res.json({message:"success",data:userinfo});
         }

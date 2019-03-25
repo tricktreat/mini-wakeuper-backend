@@ -10,7 +10,7 @@ const router = Router();
 
 router.post('/', function(req:Request, res:Response,next:NextFunction) {
     let args=req.body
-    console.log("签到参数："+args.signTime)
+    // console.log("签到参数："+args.signTime)
     connection.then(
     async conn=>{
         const signinInfoRepository = conn.getRepository(SigninInfo);
@@ -22,7 +22,7 @@ router.post('/', function(req:Request, res:Response,next:NextFunction) {
 
 router.get('/day', function(req:Request, res:Response,next:NextFunction) {
     let args=req.query
-    console.log("day："+args.date)
+    // console.log("day："+args.date)
     connection.then(
     async conn=>{
         const signinInfoRepository = conn.getRepository(SigninInfo);
@@ -42,7 +42,7 @@ router.get('/day', function(req:Request, res:Response,next:NextFunction) {
 
 router.get('/month', function(req:Request, res:Response,next:NextFunction) {
     let args=req.query
-    console.log("month："+args.month)
+    // console.log("month："+args.month)
     connection.then(
     async conn=>{
         const userInfoRepository = conn.getRepository(UserInfo);

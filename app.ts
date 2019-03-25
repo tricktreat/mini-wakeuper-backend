@@ -6,6 +6,7 @@ import userinfo from "./routes/userinfo";
 import signin from "./routes/signin";
 import aboutus from "./routes/aboutus";
 import swiperimage from "./routes/swiperimage";
+
 const app = express();
 app.use(bodyParser.json());
 app.use('/userinfo',userinfo);

@@ -25,7 +25,7 @@ router.get('/', function(req:Request, res:Response,next:NextFunction) {
               where:{user:args.openId},
             })
             const userinfo=await userInfoRepository.findOne({
-              relations:["likeinfos"],
+              relations:["tolikeinfos"],
               join:{
                   alias: "userinfo",
               },
@@ -37,9 +37,7 @@ router.get('/', function(req:Request, res:Response,next:NextFunction) {
             userinfo["corn"]=allsigninfo.reduce((prev,cur)=>{
               return prev+cur.corn
             },0)
-            userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{
-              return prev+cur.corn
-            },0)
+            userinfo["like"]=userinfo.tolikeinfos.length
             res.json({message:"success",data:userinfo});
           }
     )
@@ -66,12 +64,13 @@ router.get('/member', function(req:Request, res:Response,next:NextFunction) {
           let where={}
           where["member"]=MoreThan(0)
           if(args.patten){
-            where["name"]=Like(args.patten)
+            where["name"]=Like("%"+args.patten+"%")
           }
           const userinfo=await userInfoRepository.find({
             where:where,
             order: {
               member: "DESC",
+              registerTime:"ASC"
           }
           });
           res.json({message:"success",data:userinfo});
@@ -105,7 +104,7 @@ router.get('/register', function(req:Request, res:Response,next:NextFunction) {
               where:{user:openId},
             })
             let userinfo=await userInfoRepository.findOne({
-              relations:["likeinfos"],
+              relations:["tolikeinfos"],
               join:{
                   alias: "userinfo",
               },
@@ -114,7 +113,7 @@ router.get('/register', function(req:Request, res:Response,next:NextFunction) {
             if(!userinfo){
               userinfo=userInfoRepository.create({openId:openId})
               userInfoRepository.save(userinfo);
-              userinfo["likeinfos"]=[];
+              userinfo["tolikeinfos"]=[];
             }
             userinfo["signinfos"]=todaysigninfo;
             userinfo["tags"]=userinfo["tag"].split(';',3)
@@ -122,9 +121,7 @@ router.get('/register', function(req:Request, res:Response,next:NextFunction) {
             userinfo["corn"]=allsigninfo.reduce((prev,cur)=>{
               return prev+cur.corn
             },0)
-            userinfo["like"]=userinfo.likeinfos.reduce((prev,cur)=>{
-              return prev+cur.corn
-            },0)
+            userinfo["like"]=userinfo.tolikeinfos.length
             res.json({message:"success",data:userinfo});
           }
         )

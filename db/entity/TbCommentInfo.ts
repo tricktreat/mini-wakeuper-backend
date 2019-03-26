@@ -4,13 +4,16 @@ import { UserInfo } from "./TbUserInfo";
 import { MomentInfo } from "./TbMomentInfo";
 
 @Entity()
-export class LikeInfo extends BaseEntity {
+export class CommentInfo extends BaseEntity {
 
     // @PrimaryColumn()
     // openId: string;
 
     @PrimaryColumn()
     createTime:Date;
+
+    @Column()
+    content: string;
 
     @ManyToOne(type => UserInfo, user => user.fromlikeinfos,{primary:true})
     @JoinColumn({ name: 'from' })

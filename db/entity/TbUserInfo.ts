@@ -2,6 +2,7 @@ import "reflect-metadata";
 import {Entity, PrimaryColumn, Column, BaseEntity,OneToMany, CreateDateColumn} from "typeorm";
 import { SigninInfo } from "./TbSigninInfo";
 import { LikeInfo } from "./TbLikeInfo";
+import { MomentInfo } from "./TbMomentInfo";
 
 @Entity()
 export class UserInfo extends BaseEntity {
@@ -94,6 +95,12 @@ export class UserInfo extends BaseEntity {
     @OneToMany(type => SigninInfo, signinfo => signinfo.user)
     signinfos: SigninInfo[];
     
+    @OneToMany(type => MomentInfo, momentinfos => momentinfos.user)
+    momentinfos: MomentInfo[];
+
     @OneToMany(type => LikeInfo, likeinfo => likeinfo.toUser)
-    likeinfos: SigninInfo[];
+    tolikeinfos: LikeInfo[];
+
+    @OneToMany(type => LikeInfo, likeinfo => likeinfo.fromUser)
+    fromlikeinfos: LikeInfo[];
 }

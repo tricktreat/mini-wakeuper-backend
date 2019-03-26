@@ -1,8 +1,6 @@
 import "reflect-metadata";
 import {Entity, PrimaryColumn, Column, BaseEntity,ManyToOne,JoinColumn, PrimaryGeneratedColumn} from "typeorm";
 import { UserInfo } from "./TbUserInfo";
-import { generateKeyPair } from "crypto";
-import "reflect-metadata";
 
 @Entity()
 export class SigninInfo extends BaseEntity {
@@ -21,6 +19,4 @@ export class SigninInfo extends BaseEntity {
         default:1
     })
     corn:number;
-
-
 }

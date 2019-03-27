@@ -15,6 +15,7 @@ router.post('/', function(req:Request, res:Response,next:NextFunction) {
     async conn=>{
         const signinInfoRepository = conn.getRepository(SigninInfo);
         const signinfo=signinInfoRepository.create({"user":args.openId,"signTime":new Date(args.signTime)})
+        console.log(signinfo)
         signinInfoRepository.save(signinfo);
         res.json({"message":"success"});
     })

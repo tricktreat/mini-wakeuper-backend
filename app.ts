@@ -7,6 +7,7 @@ import signin from "./routes/signin";
 import aboutus from "./routes/aboutus";
 import swiperimage from "./routes/swiperimage";
 import moment from "./routes/moment";
+import message from "./routes/message";
 
 const app = express();
 app.use(bodyParser.json());
@@ -15,6 +16,7 @@ app.use('/signin',signin);
 app.use('/aboutus',aboutus);
 app.use('/swiperimage',swiperimage);
 app.use('/moment',moment);
+app.use('/formid',message);
 
 app.get('/',function(req: Request, res: Response){
 	res.status(200).send("wakeuper")

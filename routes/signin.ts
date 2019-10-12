@@ -5,7 +5,7 @@ import * as qs from 'querystring';
 import connection from "../db/connection";
 import { SigninInfo } from "../db/entity/TbSigninInfo";
 import { UserInfo } from "../db/entity/TbUserInfo";
-import {MoreThanOrEqual} from "typeorm";
+import {MoreThanOrEqual, Not} from "typeorm";
 const router = Router();
 
 router.post('/', function(req:Request, res:Response,next:NextFunction) {
@@ -52,8 +52,19 @@ router.get('/month', function(req:Request, res:Response,next:NextFunction) {
             join:{
                 alias: "userinfo",
             },
-            where:{"userinfo.signinfos.signTime":MoreThanOrEqual(args.month)},
+            where:{avatarUrl:Not("")}
+            // where:{"userinfo.signinfos.signTime":MoreThanOrEqual(args.month)},
         });
+        userinfos.filter((userinfo)=>{
+            let _signinfos=[]
+            for(let signinfo of userinfo.signinfos){
+                // 这里构造时间加不加GMT应该没什么区别的，但是不加时间就不对了
+                if(signinfo.signTime>new Date(args.month+' GMT+08')){
+                    _signinfos.push(signinfo)
+                }
+                userinfo.signinfos=_signinfos
+            }
+        })
         userinfos.sort((a,b)=>{
             if(a.signinfos.length>b.signinfos.length){
                 return -1
@@ -74,6 +85,7 @@ router.get('/all', function(req:Request, res:Response,next:NextFunction) {
             join:{
                 alias: "userinfo",
             },
+            where:{avatarUrl:Not("")}
         });
         userinfos.sort((a,b)=>{
             if(a.signinfos.length>b.signinfos.length){
